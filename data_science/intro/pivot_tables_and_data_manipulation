@@ -1,0 +1,59 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Tue Aug 15 11:58:14 2017
+
+@author: filipwojcik
+"""
+
+import pandas as pd
+import os
+import numpy as np
+import sklearn.datasets as data
+import matplotlib.pyplot as plt
+
+print(os.getcwd())
+    
+
+titanic_data = pd.DataFrame.from_csv("./projects/phd_materials/data_science/intro/data/titanic_train_data.csv", index_col=None)
+pd.pivot_table(titanic_data, values='Survived', index='Pclass', columns="Sex",aggfunc='sum')
+
+titanic_data_small = pd.DataFrame({
+        'sex': ['male', 'male', 'female', 'female', 'male'],
+        'survived': [ 1, 0, 1, 1, 0],
+        'passenger class': [1, 1, 2, 3, 3]
+        })
+
+pd.pivot_table(
+        titanic_data_small,
+        values='survived',
+        index='passenger class',
+        columns='sex',
+        
+        aggfunc=np.sum)
+
+boston_data = data.load_boston()
+boston_df = pd.DataFrame(boston_data.data)
+boston_df.columns = boston_data.feature_names
+
+boston_df.plot(x='RM', y='y', kind='scatter')
+pd.plot(x=boston_df.CRIM, y=boston_df.y, type='scatter')
+
+y = boston_data.target
+
+import statsmodels.api as stm
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import  regression
+
+lr = LinearRegression(normalize=True)
+fitted = lr.fit(boston_df, y)
+predicted = fitted.predict(boston_df)
+regression.mean_squared_error(y, predicted)
+regression.r2_score(y, predicted)
+plt.scatter(x=y, y=predicted)
+
+import statsmodels.api as stm
+
+model = stm.OLS(boston_data.target, stm.add_constant(boston_df))
+results = model.fit()
+print(results.summary())
